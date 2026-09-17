@@ -1,0 +1,107 @@
+{
+  "subtitle": "Architecture decisions recorded as connected neural pathways — context, the branches considered, the pathway committed, and the biological reason it survives contact with production.",
+  "clusters": [
+    {
+      "id": "coroutines-flow",
+      "ref": "NX-01",
+      "region": "Concurrency",
+      "title": "Coroutines vs. Flow",
+      "context": "Screens needed discrete one-shot writes (submit form, fetch profile) beside continuous streams (live position, search-as-you-type). Forcing both through one abstraction produced either leaked collectors or synthetic single-emission streams.",
+      "branches": [
+        { "name": "suspend fun", "gain": "Zero collection boilerplate, linear control flow, cancels with its scope.", "cost": "Single value only; cannot represent time." },
+        { "name": "cold Flow", "gain": "Multi-value, declarative operators, backpressure, lazy.", "cost": "Needs repeatOnLifecycle; deep chains obscure stack traces." },
+        { "name": "StateFlow / SharedFlow", "gain": "Conflated state, multicast, read-only surface.", "cost": "StateFlow dedupes by equals(); SharedFlow drops without a buffer." }
+      ],
+      "pathway": "suspend fun for every imperative mutation at the repository boundary. Cold Flow for streaming queries at the data-source layer. A single read-only StateFlow<UiState> at the ViewModel. SharedFlow strictly for true one-shot effects.",
+      "reason": "Structured concurrency makes cancellation a lifecycle property instead of manual bookkeeping. StateFlow hands the UI one immutable, always-readable snapshot, which removes the double-fetch bug that naive Flow collection produces on configuration change.",
+      "synapses": [
+        { "id": "a", "label": "suspend", "x": 12, "y": 50 },
+        { "id": "b", "label": "Flow", "x": 38, "y": 22 },
+        { "id": "c", "label": "StateFlow", "x": 66, "y": 62 },
+        { "id": "d", "label": "UI", "x": 92, "y": 38 }
+      ],
+      "links": [
+        ["a", "b"],
+        ["a", "c"],
+        ["b", "c"],
+        ["c", "d"]
+      ]
+    },
+    {
+      "id": "compose-stability",
+      "ref": "NX-02",
+      "region": "UI Architecture",
+      "title": "Compose recomposition at scale",
+      "context": "A 40+ module codebase migrated from XML. Unchecked adoption produced cascading recomposition and first-run jank on mid-tier devices, because unstable parameters invalidated entire subtrees.",
+      "branches": [
+        { "name": "Stay on XML", "gain": "Predictable measure/layout, mature profiling.", "cost": "Boilerplate, two sources of theme truth, slow velocity." },
+        { "name": "Unchecked Compose", "gain": "Fast to write, declarative, no ViewBinding.", "cost": "Unstable List/class params; JIT warm-up jank on first run." },
+        { "name": "Disciplined Compose", "gain": "Deterministic skipping, AOT'd hot paths.", "cost": "Requires @Immutable contracts + compiler metrics in CI." }
+      ],
+      "pathway": "Compose for all new features under a strict stability contract: immutable models or @Immutable holders, lambda-deferred state reads (Modifier.offset { } over offset()), explicit keys on lazy items, and Macrobenchmark-generated Baseline Profiles shipped in release builds.",
+      "reason": "Compose only skips a composable when its inputs are stable and equal — stability is a compiler inference problem, not a style preference. Deferring reads scopes invalidation to layout/draw rather than composition, and Baseline Profiles remove first-run JIT warm-up so the initial frame is already fast.",
+      "synapses": [
+        { "id": "a", "label": "state read", "x": 10, "y": 30 },
+        { "id": "b", "label": "@Immutable", "x": 36, "y": 66 },
+        { "id": "c", "label": "skip", "x": 64, "y": 24 },
+        { "id": "d", "label": "60fps", "x": 91, "y": 54 }
+      ],
+      "links": [
+        ["a", "c"],
+        ["b", "c"],
+        ["c", "d"],
+        ["a", "b"]
+      ]
+    },
+    {
+      "id": "mvvm-mvi",
+      "ref": "NX-03",
+      "region": "State Management",
+      "title": "MVVM vs. MVI",
+      "context": "Checkout with promo codes, optimistic updates, and rollback sat beside a settings toggle. One pattern for both meant ceremony on trivial screens and race conditions on the complex one.",
+      "branches": [
+        { "name": "Classic MVVM", "gain": "Low ceremony, granular updates, fast onboarding.", "cost": "Independent observables tear — isLoading=false before data arrives." },
+        { "name": "Pure MVI", "gain": "Single immutable state, deterministic, trivially testable.", "cost": "Reducer boilerplate; data-class copies on small tweaks." }
+      ],
+      "pathway": "Strict MVI — one sealed UiState and an intent reducer — for high-consequence stateful flows (checkout, sync, playback). Lightweight MVVM for read-mostly screens. The boundary is written down so the team applies it consistently.",
+      "reason": "A single sealed UiState makes impossible states unrepresentable: a loading spinner and an error card cannot co-exist. Transitions become pure functions you assert on with StateFlow.value, with no View lifecycle mocking. On simple screens that rigour is pure overhead, so it stays scoped.",
+      "synapses": [
+        { "id": "a", "label": "intent", "x": 10, "y": 44 },
+        { "id": "b", "label": "reducer", "x": 40, "y": 60 },
+        { "id": "c", "label": "UiState", "x": 68, "y": 26 },
+        { "id": "d", "label": "render", "x": 92, "y": 50 }
+      ],
+      "links": [
+        ["a", "b"],
+        ["b", "c"],
+        ["c", "d"]
+      ]
+    },
+    {
+      "id": "offline-sync",
+      "ref": "NX-04",
+      "region": "Offline-First",
+      "title": "WorkManager + Room vs. real-time push",
+      "context": "Field and transit apps had to sync across intermittent connectivity. A persistent WebSocket drained battery and failed silently once Android's Doze and app-standby buckets backgrounded the process.",
+      "branches": [
+        { "name": "Persistent socket", "gain": "Sub-100ms latency while foregrounded.", "cost": "Killed by OEM limits; silent failure on network transition." },
+        { "name": "FCM data messages", "gain": "Wakes app without a held connection.", "cost": "Delivery latency unguaranteed under Play Services throttling." },
+        { "name": "Outbox + WorkManager", "gain": "Guaranteed under constraints; survives process death and reboot.", "cost": "Not real-time; server must be idempotent." }
+      ],
+      "pathway": "Transactional outbox inside Room — user actions written to the outbox table in the same SQLite transaction as the UI state. An expedited WorkManager job with NetworkType.CONNECTED drains it. WebSockets remain an ephemeral foreground accelerator, never the source of truth.",
+      "reason": "Android progressively restricts background execution; WorkManager is the only contract that guarantees work survives process death, reboots, and OEM power management. Treating the server as an eventual sync target rather than a blocking prerequisite is what keeps the UI fully responsive inside a subway tunnel.",
+      "synapses": [
+        { "id": "a", "label": "write", "x": 9, "y": 52 },
+        { "id": "b", "label": "outbox", "x": 37, "y": 24 },
+        { "id": "c", "label": "worker", "x": 65, "y": 64 },
+        { "id": "d", "label": "server", "x": 92, "y": 36 }
+      ],
+      "links": [
+        ["a", "b"],
+        ["b", "c"],
+        ["c", "d"],
+        ["a", "c"]
+      ]
+    }
+  ]
+}

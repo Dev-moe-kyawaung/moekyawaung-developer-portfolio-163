@@ -1,0 +1,298 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   ORBITAL NEURAL COMMAND
+   Satellite telemetry discipline × neural-network architecture ×
+   holographic depth panels.
+   --------------------------------------------------------------------------
+   Two accents only:
+     --bio    #3EE8C8  bioluminescent — living systems, interactive states
+     --signal #F2A03D  orbital amber — mission data, warnings, sparse
+   Depth is real CSS 3D (perspective + translateZ), not WebGL.
+   Every animation is transform/opacity only. 60fps.
+   ========================================================================== */
+
+@theme {
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Deep-space surfaces */
+  --color-void: #050a0d;
+  --color-deep: #071014;
+  --color-panel: #0b171c;
+  --color-panel2: #0f2027;
+  --color-line: rgba(62, 232, 200, 0.15);
+  --color-line2: rgba(62, 232, 200, 0.32);
+
+  /* Type */
+  --color-ink: #e8f6f3;
+  --color-ink2: #a3bfb9;
+  --color-ink3: #7c9a94;
+
+  /* Accents */
+  --color-bio: #3ee8c8;
+  --color-bio-soft: #7ff5e0;
+  --color-signal: #f2a03d;
+  --color-neural: #b98cff;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ambient: star field + two bio blooms, fixed, zero repaint cost */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(232, 246, 243, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 12%, rgba(232, 246, 243, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 64%, rgba(232, 246, 243, 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 72%, rgba(232, 246, 243, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 56% 34%, rgba(232, 246, 243, 0.28) 50%, transparent 51%),
+    radial-gradient(1px 1px at 22% 88%, rgba(232, 246, 243, 0.3) 50%, transparent 51%),
+    radial-gradient(46rem 34rem at 76% 6%, rgba(62, 232, 200, 0.1), transparent 62%),
+    radial-gradient(40rem 30rem at 8% 30%, rgba(185, 140, 255, 0.06), transparent 58%),
+    radial-gradient(52rem 26rem at 50% 108%, rgba(62, 232, 200, 0.08), transparent 64%);
+}
+
+::selection {
+  background: var(--color-bio);
+  color: #04120f;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-bio);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background: linear-gradient(var(--color-bio), rgba(62, 232, 200, 0.25));
+}
+
+@layer components {
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-bio);
+  }
+
+  /* Holographic panel */
+  .holo {
+    position: relative;
+    border: 1px solid var(--color-line);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(15, 32, 39, 0.72), rgba(7, 16, 20, 0.88));
+    box-shadow:
+      inset 0 1px 0 rgba(127, 245, 224, 0.07),
+      0 22px 54px -30px rgba(62, 232, 200, 0.35);
+    backdrop-filter: blur(10px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease;
+  }
+  .holo-live:hover {
+    border-color: var(--color-line2);
+    box-shadow:
+      inset 0 1px 0 rgba(127, 245, 224, 0.12),
+      0 0 0 1px rgba(62, 232, 200, 0.16),
+      0 30px 66px -30px rgba(62, 232, 200, 0.5);
+  }
+
+  /* Holographic edge scan line (single, slow, subtle) */
+  .scanline::after {
+    content: "";
+    position: absolute;
+    inset-inline: 8%;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-bio), transparent);
+    opacity: 0.5;
+    animation: scan-y 7s linear infinite;
+    pointer-events: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 0.28rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid var(--color-line);
+    background: rgba(11, 23, 28, 0.85);
+    color: var(--color-ink2);
+    white-space: nowrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 0.68rem 1.1rem;
+    border-radius: 8px;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+      transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-bio {
+    background: var(--color-bio);
+    color: #04120f;
+    box-shadow: 0 0 24px -8px rgba(62, 232, 200, 0.8);
+  }
+  .btn-bio:hover {
+    background: var(--color-bio-soft);
+    box-shadow: 0 0 34px -8px rgba(62, 232, 200, 1);
+  }
+  .btn-ghost {
+    border: 1px solid var(--color-line2);
+    color: var(--color-ink);
+    background: rgba(11, 23, 28, 0.6);
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-bio);
+    color: var(--color-bio-soft);
+  }
+}
+
+@layer utilities {
+  /* ---- radar ---- */
+  @keyframes sweep {
+    to { transform: rotate(360deg); }
+  }
+  .sweep { animation: sweep 6.5s linear infinite; transform-origin: 50% 50%; }
+
+  /* ---- orbital bodies ---- */
+  @keyframes orbit {
+    to { transform: rotate(360deg); }
+  }
+  .orbit { animation: orbit linear infinite; }
+  .orbit-rev { animation: orbit linear infinite reverse; }
+
+  /* ---- organic / neural ---- */
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.07); opacity: 1; }
+  }
+  .breathe { animation: breathe 4.2s ease-in-out infinite; }
+
+  @keyframes synapse-fire {
+    0%, 100% { opacity: 0.22; }
+    50% { opacity: 1; }
+  }
+  .synapse { animation: synapse-fire 3.4s ease-in-out infinite; }
+
+  @keyframes pulse-node {
+    0% { transform: scale(0.7); opacity: 0.85; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+  .pulse-node { animation: pulse-node 2.8s ease-out infinite; }
+
+  /* ---- holographic depth reveal (zoom-in) ---- */
+  .holo-in {
+    opacity: 0;
+    transform: perspective(1400px) translateY(26px) translateZ(-90px) rotateX(5deg);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+  .holo-in.arrived {
+    opacity: 1;
+    transform: perspective(1400px) translateY(0) translateZ(0) rotateX(0);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---- meters & telemetry ---- */
+  @keyframes fill-x {
+    from { transform: scaleX(0); }
+  }
+  .fill-x { transform-origin: left; animation: fill-x 1.05s cubic-bezier(0.2, 0, 0, 1) both; }
+
+  @keyframes led {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.18; }
+  }
+  .led { animation: led 1.3s steps(1) infinite; }
+
+  /* ---- energy travelling a path ---- */
+  @keyframes flow {
+    to { stroke-dashoffset: -240; }
+  }
+  .flow-line {
+    stroke-dasharray: 4 10;
+    animation: flow 3.6s linear infinite;
+  }
+
+  .starfield { position: absolute; inset: 0; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sweep, .orbit, .orbit-rev, .breathe, .synapse, .pulse-node,
+  .fill-x, .led, .flow-line, .scanline::after {
+    animation: none !important;
+  }
+  .holo-in, .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

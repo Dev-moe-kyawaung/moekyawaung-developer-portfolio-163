@@ -1,0 +1,23 @@
+{
+  "name": "Moe Kyaw Aung",
+  "title": "Senior Android Developer",
+  "specialization": "Kotlin · Jetpack Compose · Clean Architecture",
+  "positioning": "Building offline-first, 60fps Android experiences at scale — from GTFS-Realtime transit pipelines to Play Store-shipped consumer apps.",
+  "callsign": "MKA-01",
+  "location": "Bangkok, TH · Tachileik, MM · Remote (EU/US/APAC)",
+  "email": "hello@moekyawaung.dev",
+  "calendlyUrl": "https://cal.com/moekyawaung/30min",
+  "githubUrl": "https://github.com/Dev-moe-kyawaung",
+  "githubHandle": "Dev-moe-kyawaung",
+  "linkedinUrl": "https://www.linkedin.com/in/moe-kyaw-aung-2653093a1",
+  "linkedinHandle": "in/moe-kyaw-aung",
+  "resumeUrl": "/resume.pdf",
+  "portraitUrl": "https://res.cloudinary.com/dye5qpwii/image/upload/v1778527878/IMG_20260430_053105_uef0yr.png",
+  "fallbackPortrait": "/moe-portrait.jpg",
+  "trustSignal": "8+ years shipping Android · 25+ production apps · 500k+ installs · 99.9% fleet crash-free · 82+ verified certifications",
+  "availability": {
+    "status": "Available for Senior & Staff Android roles",
+    "type": "Full-time · Contract · Advisory",
+    "locationPreference": "Remote (EU, US, APAC overlap)"
+  }
+}

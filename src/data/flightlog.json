@@ -1,0 +1,44 @@
+{
+  "subtitle": "Reverse-chronological flight record. Green markers are production milestones — code that reached real users. Cyan markers are platform and architecture work that made the next launch possible.",
+  "logs": [
+    {
+      "id": "lead",
+      "role": "Senior Android Engineer & Architecture Lead",
+      "org": "Fintech & Mobile Platforms",
+      "dates": "2023 — Present",
+      "kind": "production",
+      "readouts": [
+        "Architected 12-module Clean Architecture and cut cold-start latency 38% (1.42s → 0.88s) using Baseline Profiles with Macrobenchmark gates in CI.",
+        "Built an offline-first reconciliation layer on Room + transactional outbox reaching 99.98% successful sync across unstable 3G/4G uplinks.",
+        "Authored Compose stability guidelines and automated ktlint/detekt/coverage gates, collapsing PR review cycles from 3 days to under 4 hours."
+      ],
+      "stack": ["Kotlin", "Compose", "Coroutines/Flow", "Hilt", "Room", "Baseline Profiles", "GitHub Actions"]
+    },
+    {
+      "id": "platform",
+      "role": "Mobile Platform & Architecture Specialist",
+      "org": "Enterprise Retail & Transit Systems",
+      "dates": "2021 — 2023",
+      "kind": "architecture",
+      "readouts": [
+        "Migrated a legacy RxJava/XML codebase to Coroutines and Jetpack Compose without freezing the product roadmap.",
+        "Built a hardware-accelerated rendering pipeline for GTFS-Realtime maps, holding 60fps through rush-hour density at 2.4M daily events.",
+        "Engineered SQLCipher-encrypted storage and biometric auth for POS terminals clearing 100k+ transactions per month."
+      ],
+      "stack": ["Kotlin", "MVI", "WorkManager", "SQLCipher", "Protobuf", "Media3", "Turbine"]
+    },
+    {
+      "id": "agency",
+      "role": "Android Developer",
+      "org": "Mobile Agency & Digital Products",
+      "dates": "2018 — 2021",
+      "kind": "production",
+      "readouts": [
+        "Shipped 15+ native Android applications to Google Play across commerce, streaming, tracking, and utility categories.",
+        "Authored a reusable networking and offline-caching core adopted by 6 client project teams, removing duplicated boilerplate.",
+        "Mentored 4 junior engineers on lifecycle management, LeakCanary triage, and JUnit/MockK test design."
+      ],
+      "stack": ["Kotlin", "Java", "MVVM", "Retrofit", "Room", "Firebase", "JUnit"]
+    }
+  ]
+}

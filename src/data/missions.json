@@ -1,0 +1,105 @@
+{
+  "subtitle": "Mission logs from production Android systems. Each entry records the failure mode it solved, the architecture that solved it, and the telemetry that proves it.",
+  "missions": [
+    {
+      "id": "pulsesync",
+      "designation": "MSN-01",
+      "name": "PulseSync",
+      "domain": "Offline-First Platform",
+      "classification": "FLAGSHIP",
+      "status": "OPERATIONAL",
+      "summary": "Multi-module collaboration platform engineered so unstable networks never produce split-brain state or lost edits.",
+      "failureMode": "Concurrent writes over flaky uplinks caused divergent local state; users lost offline edits and sync loops drained battery.",
+      "countermeasure": "Room as single source of truth, transactional outbox in the same SQLite write, deterministic conflict resolution, and delta streams with exponential backoff.",
+      "telemetry": [
+        { "label": "Crash-free", "value": "99.9%" },
+        { "label": "Cold start", "value": "240ms" },
+        { "label": "Sync lag", "value": "<120ms" }
+      ],
+      "stack": ["Kotlin", "Compose", "Coroutines/Flow", "Hilt", "Room", "WorkManager", "WebSocket"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.mka.pulsesync",
+      "githubUrl": "https://github.com/Dev-moe-kyawaung/pulsesync-android",
+      "span": "wide"
+    },
+    {
+      "id": "transitly",
+      "designation": "MSN-02",
+      "name": "Transitly GTFS-RT",
+      "domain": "Realtime Transit Pipeline",
+      "classification": "SCALE",
+      "status": "OPERATIONAL",
+      "summary": "Live transit arrivals ingesting 2.4M vehicle-position events daily while holding a 60fps frame budget on mid-range hardware.",
+      "failureMode": "Main-thread protobuf decoding and naive polling produced 4.2% dropped frames and heavy battery drain during rush-hour density.",
+      "countermeasure": "Off-thread GTFS-RT decode, spatial quadtree filtering, motion-adaptive poll cadence, and predictive prefetch of the rider's next two stations.",
+      "telemetry": [
+        { "label": "Frame budget", "value": "60fps" },
+        { "label": "Daily events", "value": "2.4M" },
+        { "label": "Battery", "value": "−38%" }
+      ],
+      "stack": ["Kotlin", "Compose Canvas", "Protobuf", "Flow", "WorkManager", "Hilt"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.mka.transitly",
+      "githubUrl": "https://github.com/Dev-moe-kyawaung",
+      "span": "std"
+    },
+    {
+      "id": "pos",
+      "designation": "MSN-03",
+      "name": "POS Ultimate Pro",
+      "domain": "Enterprise Point-of-Sale",
+      "classification": "RELIABILITY",
+      "status": "OPERATIONAL",
+      "summary": "Retail terminal that survives cell-tower dead zones with zero cart or audit-trail loss across 100k+ monthly transactions.",
+      "failureMode": "Uplink drops abandoned active carts and wrote unrecoverable gaps into financial audit records.",
+      "countermeasure": "SQLCipher-encrypted local ledger, idempotent WorkManager queue, MVI single-state UI, and deterministic replay on reconnect.",
+      "telemetry": [
+        { "label": "Data loss", "value": "0" },
+        { "label": "Checkout", "value": "<1s" },
+        { "label": "Registers", "value": "120+" }
+      ],
+      "stack": ["Kotlin", "Compose", "SQLCipher", "Room", "WorkManager", "MVI"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.mka.pos.pro",
+      "githubUrl": "https://github.com/moekyawaung-tech/POS-Ultimate-Pro-Max",
+      "span": "std"
+    },
+    {
+      "id": "lumen",
+      "designation": "MSN-04",
+      "name": "Lumen Player",
+      "domain": "Media Performance",
+      "classification": "OPTIMIZATION",
+      "status": "OPERATIONAL",
+      "summary": "Lifecycle-bound playback engine that removed scrub jank and memory spikes on 2GB-RAM devices.",
+      "failureMode": "Resolution switches and fast scrubbing stalled the UI thread and ballooned peak memory on low-end hardware.",
+      "countermeasure": "MediaSession service with off-thread frame extraction, custom surface composition, and Macrobenchmark-tuned Baseline Profiles.",
+      "telemetry": [
+        { "label": "Frame drops", "value": "−88%" },
+        { "label": "Peak memory", "value": "−40%" },
+        { "label": "Rating", "value": "4.8★" }
+      ],
+      "stack": ["Kotlin", "Media3", "ExoPlayer", "Compose", "Baseline Profiles"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.mka.lumen.player",
+      "githubUrl": "https://github.com/moekyawaung-tech/video-player",
+      "span": "std"
+    },
+    {
+      "id": "pulse-social",
+      "designation": "MSN-05",
+      "name": "Social Pulse",
+      "domain": "Realtime Analytics",
+      "classification": "RECOMPOSITION",
+      "status": "OPERATIONAL",
+      "summary": "Live multi-feed analytics surface that cut redundant recomposition by 65% under continuous socket pressure.",
+      "failureMode": "Concurrent metric feeds invalidated whole subtrees on every frame, causing visible hitch during chart animation.",
+      "countermeasure": "Immutable @Immutable state models, lambda-deferred state reads, request coalescing, and a tiered memory→DataStore→network cache.",
+      "telemetry": [
+        { "label": "Recomposition", "value": "−65%" },
+        { "label": "API calls", "value": "−70%" },
+        { "label": "Charts", "value": "60fps" }
+      ],
+      "stack": ["Kotlin", "Compose", "StateFlow", "Retrofit", "DataStore"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.mka.social.pulse",
+      "githubUrl": "https://github.com/moekyawaung-tech/social-dashboard",
+      "span": "std"
+    }
+  ]
+}

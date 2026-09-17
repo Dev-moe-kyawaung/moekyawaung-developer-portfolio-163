@@ -1,0 +1,12 @@
+{
+  "channels": [
+    { "label": "Production apps", "value": "25+", "unit": "shipped" },
+    { "label": "Cumulative installs", "value": "500k+", "unit": "Play Store" },
+    { "label": "Fleet crash-free", "value": "99.9%", "unit": "30-day rolling" },
+    { "label": "Avg. store rating", "value": "4.8★", "unit": "across fleet" },
+    { "label": "Frame budget", "value": "60fps", "unit": "held" },
+    { "label": "Cold start", "value": "240ms", "unit": "P50" },
+    { "label": "Verified certs", "value": "82+", "unit": "9 disciplines" },
+    { "label": "Daily events processed", "value": "2.4M", "unit": "GTFS-RT" }
+  ]
+}
